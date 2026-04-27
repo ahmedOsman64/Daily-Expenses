@@ -150,17 +150,27 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                             child: CircleAvatar(
                               radius: 60,
                               backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                              backgroundImage: authVm.profileImage != null
-                                  ? (authVm.profileImage!.startsWith('http')
-                                      ? NetworkImage(authVm.profileImage!)
-                                      : FileImage(io.File(authVm.profileImage!)) as ImageProvider)
-                                  : null,
-                              child: authVm.profileImage == null
-                                  ? Text(
+                              child: authVm.profileImage != null
+                                  ? ClipOval(
+                                      child: Image(
+                                        image: authVm.profileImage!.startsWith('http')
+                                            ? NetworkImage(authVm.profileImage!)
+                                            : FileImage(io.File(authVm.profileImage!)) as ImageProvider,
+                                        fit: BoxFit.cover,
+                                        width: 120,
+                                        height: 120,
+                                        errorBuilder: (context, error, stackTrace) => Center(
+                                          child: Text(
+                                            (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
                                       (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
                                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
-                                    )
-                                  : null,
+                                    ),
                             ),
                           ),
                           Positioned(

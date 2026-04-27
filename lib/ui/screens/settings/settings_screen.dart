@@ -208,17 +208,27 @@ class SettingsScreen extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                      backgroundImage: vm.profileImage != null
-                          ? (vm.profileImage!.startsWith('http')
-                              ? NetworkImage(vm.profileImage!)
-                              : FileImage(io.File(vm.profileImage!)) as ImageProvider)
-                          : null,
-                      child: vm.profileImage == null
-                          ? Text(
+                      child: vm.profileImage != null
+                          ? ClipOval(
+                              child: Image(
+                                image: vm.profileImage!.startsWith('http')
+                                    ? NetworkImage(vm.profileImage!)
+                                    : FileImage(io.File(vm.profileImage!)) as ImageProvider,
+                                fit: BoxFit.cover,
+                                width: 100,
+                                height: 100,
+                                errorBuilder: (context, error, stackTrace) => Center(
+                                  child: Text(
+                                    (vm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 32),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Text(
                               (vm.userName ?? 'U').substring(0, 1).toUpperCase(),
                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 32),
-                            )
-                          : null,
+                            ),
                     ),
                   ),
                   Positioned(
