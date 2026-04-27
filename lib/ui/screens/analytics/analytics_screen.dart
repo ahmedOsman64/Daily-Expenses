@@ -12,7 +12,6 @@ import '../../../navigation/app_router.dart';
 import '../../components/floating_nav_bar.dart';
 import '../../../core/services/pdf_service.dart';
 
-
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
 
@@ -27,10 +26,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Future<void> _downloadReport() async {
     final vm = context.read<ExpenseViewModel>();
     final authVm = context.read<AuthViewModel>();
-    
+
     // Show loading
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Generating PDF Report...'), duration: Duration(seconds: 1)),
+      const SnackBar(
+        content: Text('Generating PDF Report...'),
+        duration: Duration(seconds: 1),
+      ),
     );
 
     try {
@@ -45,14 +47,16 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error generating PDF: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
   }
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox.expand(
@@ -79,20 +83,24 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   children: [
                     // Header
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => Navigator.pop(context),
-                              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Spending Analytics',
+                            style: AppTypography.headingLarge.copyWith(
+                              color: Colors.white,
+                              fontSize: 20,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Spending Analytics',
-                              style: AppTypography.headingLarge.copyWith(color: Colors.white, fontSize: 24),
-                            ),
-                          ],
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         IconButton(
                           onPressed: _downloadReport,
@@ -102,7 +110,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                               color: AppColors.primary.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.picture_as_pdf_rounded, color: AppColors.primary),
+                            child: const Icon(
+                              Icons.picture_as_pdf_rounded,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ],
@@ -119,7 +131,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     const SizedBox(height: 32),
                     Text(
                       'Category Breakdown',
-                      style: AppTypography.headingMedium.copyWith(color: Colors.white, fontSize: 20),
+                      style: AppTypography.headingMedium.copyWith(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _buildCategoryList(),
@@ -166,10 +181,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     curve: Curves.easeInOut,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      color: isSelected
+                          ? AppColors.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: isSelected
-                          ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 4))]
+                          ? [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.4),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
                           : [],
                     ),
                     child: Text(
@@ -177,7 +200,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.white54,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         fontSize: 13,
                       ),
                     ),
@@ -215,12 +240,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   children: [
                     Text(
                       '$_selectedPeriod Spending',
-                      style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       CurrencyFormatter.format(total),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 28),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
                     ),
                   ],
                 ),
@@ -228,11 +260,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('Transactions', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const Text(
+                    'Transactions',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     '$count',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 28),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                    ),
                   ),
                 ],
               ),
@@ -259,7 +298,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             children: [
               Text(
                 '$_selectedPeriod Overview',
-                style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 32),
               SizedBox(height: 220, child: _buildPieChart()),
@@ -269,7 +312,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 children: [
                   Icon(Icons.info_outline, color: Colors.white54, size: 16),
                   SizedBox(width: 8),
-                  Text('Tap sections for details', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  Text(
+                    'Tap sections for details',
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                 ],
               ),
             ],
@@ -289,7 +335,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.pie_chart_outline_rounded, size: 64, color: Colors.white.withValues(alpha: 0.2)),
+            Icon(
+              Icons.pie_chart_outline_rounded,
+              size: 64,
+              color: Colors.white.withValues(alpha: 0.2),
+            ),
             const SizedBox(height: 12),
             Text(
               'No data for $_selectedPeriod period',
@@ -311,7 +361,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             value: entry.value,
             title: '${percentage.toStringAsFixed(0)}%',
             radius: 40,
-            titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+            titleStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           );
         }).toList(),
       ),
@@ -331,7 +385,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Center(
-          child: Text('No expenses for this period.', style: TextStyle(color: Colors.white54, fontSize: 14)),
+          child: Text(
+            'No expenses for this period.',
+            style: TextStyle(color: Colors.white54, fontSize: 14),
+          ),
         ),
       );
     }
@@ -359,27 +416,44 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: _getCategoryColor(entry.key).withValues(alpha: 0.2),
+                      color: _getCategoryColor(
+                        entry.key,
+                      ).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(entry.key.icon, style: const TextStyle(fontSize: 20)),
+                    child: Text(
+                      entry.key.icon,
+                      style: const TextStyle(fontSize: 20),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(entry.key.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text(
+                          entry.key.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         Text(
                           '${percentage.toStringAsFixed(1)}% of total',
-                          style: const TextStyle(color: Colors.white60, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   Text(
                     CurrencyFormatter.format(entry.value),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -390,7 +464,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   value: barFraction,
                   minHeight: 6,
                   backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  valueColor: AlwaysStoppedAnimation<Color>(_getCategoryColor(entry.key)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getCategoryColor(entry.key),
+                  ),
                 ),
               ),
             ],
@@ -402,12 +478,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Color _getCategoryColor(ExpenseCategory cat) {
     switch (cat) {
-      case ExpenseCategory.food: return AppColors.catFood;
-      case ExpenseCategory.transport: return AppColors.catTransport;
-      case ExpenseCategory.shopping: return AppColors.catShopping;
-      case ExpenseCategory.bills: return AppColors.catBills;
-      case ExpenseCategory.entertainment: return AppColors.catEntertainment;
-      case ExpenseCategory.other: return AppColors.catOther;
+      case ExpenseCategory.food:
+        return AppColors.catFood;
+      case ExpenseCategory.transport:
+        return AppColors.catTransport;
+      case ExpenseCategory.shopping:
+        return AppColors.catShopping;
+      case ExpenseCategory.bills:
+        return AppColors.catBills;
+      case ExpenseCategory.entertainment:
+        return AppColors.catEntertainment;
+      case ExpenseCategory.other:
+        return AppColors.catOther;
     }
   }
 }

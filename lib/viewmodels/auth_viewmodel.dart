@@ -7,8 +7,11 @@ class AuthViewModel extends ChangeNotifier {
   String _email = 'ahmed@example.com';
   String? _profileImage;
 
+  String? _userId;
+
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _isLoggedIn;
+  String? get userId => _userId;
   String? get userName => _userName;
   String get email => _email;
   String? get profileImage => _profileImage;
@@ -23,6 +26,7 @@ class AuthViewModel extends ChangeNotifier {
     if (email.isNotEmpty && password.length >= 6) {
       _isLoggedIn = true;
       _userName = 'Ahmed';
+      _userId = 'user_123'; // Mock ID
       _isLoading = false;
       notifyListeners();
     } else {
@@ -41,6 +45,7 @@ class AuthViewModel extends ChangeNotifier {
 
     _isLoggedIn = true;
     _userName = name;
+    _userId = 'user_${DateTime.now().millisecondsSinceEpoch}'; // Mock ID
     _isLoading = false;
     notifyListeners();
   }

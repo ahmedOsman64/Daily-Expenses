@@ -94,6 +94,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
     if (_isExpense) {
       vm.updateExpense(Expense(
         id: widget.expense!.id,
+        userId: widget.expense!.userId,
         title: title,
         amount: amount,
         category: _selectedExpenseCat!,
@@ -103,6 +104,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
     } else {
       vm.updateIncome(Income(
         id: widget.income!.id,
+        userId: widget.income!.userId,
         title: title,
         amount: amount,
         category: _selectedIncomeCat!,
@@ -131,8 +133,9 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -164,7 +167,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
                         child: Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.08),
+                            color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                           ),
@@ -176,13 +179,16 @@ class _EditTransactionScreenState extends State<EditTransactionScreen>
                               TextFormField(
                                 controller: _amountController,
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
                                 decoration: InputDecoration(
+                                  filled: false,
                                   border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
                                   prefixText: '\$ ',
                                   prefixStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 28),
                                   hintText: '0.00',
-                                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.2), fontSize: 32),
+                                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.2), fontSize: 36),
                                 ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) return 'Amount required';

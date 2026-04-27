@@ -170,6 +170,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   _buildGlassTextField(
                                     controller: _emailController,
                                     label: 'Email Address',
+                                    hintText: 'Enter your email',
                                     icon: Icons.email_outlined,
                                     keyboardType: TextInputType.emailAddress,
                                   ),
@@ -177,6 +178,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   _buildGlassTextField(
                                     controller: _passwordController,
                                     label: 'Password',
+                                    hintText: 'Enter your password',
                                     icon: Icons.lock_outline,
                                     isPassword: _obscurePassword,
                                     suffixIcon: IconButton(
@@ -330,6 +332,7 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildGlassTextField({
     required TextEditingController controller,
     required String label,
+    required String hintText,
     required IconData icon,
     bool isPassword = false,
     Widget? suffixIcon,
@@ -355,6 +358,11 @@ class _LoginScreenState extends State<LoginScreen>
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.white70),
             suffixIcon: suffixIcon,
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 14,
+            ),
             filled: true,
             fillColor: Colors.white.withValues(alpha: 0.1),
             border: OutlineInputBorder(

@@ -63,23 +63,68 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final authVm = context.read<AuthViewModel>();
-    
+
+    // Show source picker
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: AppColors.gradientEnd,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Profile Photo',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSourceOption(
+                  icon: Icons.camera_alt_rounded,
+                  label: 'Camera',
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                _buildSourceOption(
+                  icon: Icons.photo_library_rounded,
+                  label: 'Gallery',
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
     try {
       final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         imageQuality: 70,
+        maxWidth: 1000,
       );
-      
+
       if (image != null && mounted) {
-        // In a real app, you would upload the image to storage (e.g. Supabase Storage)
-        // and get a URL back. For this demo, we'll use the local path or a placeholder.
         await authVm.updateProfileImage(image.path);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Profile image updated!'),
               backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
@@ -90,10 +135,36 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           SnackBar(
             content: Text('Failed to pick image: $e'),
             backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     }
+  }
+
+  Widget _buildSourceOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: Icon(icon, color: Colors.white, size: 30),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(color: Colors.white)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -149,28 +220,30 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                             ),
                             child: CircleAvatar(
                               radius: 60,
-                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                              child: authVm.profileImage != null
-                                  ? ClipOval(
-                                      child: Image(
-                                        image: authVm.profileImage!.startsWith('http')
-                                            ? NetworkImage(authVm.profileImage!)
-                                            : FileImage(io.File(authVm.profileImage!)) as ImageProvider,
-                                        fit: BoxFit.cover,
-                                        width: 120,
-                                        height: 120,
-                                        errorBuilder: (context, error, stackTrace) => Center(
-                                          child: Text(
-                                            (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
-                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
-                                          ),
-                                        ),
-                                      ),
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                              backgroundImage: authVm.profileImage != null
+                                  ? (authVm.profileImage!.startsWith('http')
+                                      ? NetworkImage(authVm.profileImage!)
+                                      : FileImage(io.File(authVm.profileImage!))
+                                          as ImageProvider)
+                                  : null,
+                              child: authVm.isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
                                     )
-                                  : Text(
-                                      (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 40),
-                                    ),
+                                  : (authVm.profileImage == null
+                                      ? Text(
+                                          (authVm.userName ?? 'U')
+                                              .substring(0, 1)
+                                              .toUpperCase(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 40,
+                                          ),
+                                        )
+                                      : null),
                             ),
                           ),
                           Positioned(

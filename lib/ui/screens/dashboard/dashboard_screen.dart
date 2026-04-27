@@ -11,6 +11,7 @@ import '../../../theme/typography.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/constants/constants.dart';
 import '../../components/summary_card.dart';
+import '../../components/financial_wisdom_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -112,7 +113,7 @@ class DashboardScreen extends StatelessWidget {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 1.1,
+                      childAspectRatio: 1.0,
                       children: [
                         SummaryCard(
                           title: 'Total Balance',
@@ -132,6 +133,20 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                // Financial Wisdom Section
+                const SliverPadding(
+                  padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: FinancialWisdomCard(),
+                  ),
+                ),
+                // Plan Section
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: _buildPlanCard(context),
                   ),
                 ),
                 // Budget Section
@@ -228,6 +243,10 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildBudgetProgress(ExpenseViewModel vm) {
     final budget = vm.monthlyBudget;
+    final isNearLimit = vm.isNearLimit;
+    final isExceeded = vm.isExceeded;
+    final statusColor = isExceeded ? AppColors.error : (isNearLimit ? Colors.orange : AppColors.primary);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -235,9 +254,15 @@ class DashboardScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
+            color: isExceeded 
+                ? AppColors.error.withValues(alpha: 0.05) 
+                : Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(
+              color: isExceeded 
+                  ? AppColors.error.withValues(alpha: 0.3) 
+                  : Colors.white.withValues(alpha: 0.1)
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,12 +270,24 @@ class DashboardScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Monthly Budget',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        'Monthly Budget',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (isNearLimit || isExceeded) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          isExceeded ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
+                          color: statusColor,
+                          size: 18,
+                        ),
+                      ],
+                    ],
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -258,19 +295,35 @@ class DashboardScreen extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: statusColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${(budget.percentage * 100).toInt()}%',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: statusColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
+              if (isNearLimit && !isExceeded)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Alert: Only 5% remaining!',
+                    style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              if (isExceeded)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: const Text(
+                    'Danger: Budget Limit Exceeded!',
+                    style: TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
               const SizedBox(height: 20),
               LayoutBuilder(
                 builder: (context, constraints) {
@@ -290,13 +343,15 @@ class DashboardScreen extends StatelessWidget {
                             constraints.maxWidth *
                             budget.percentage.clamp(0, 1),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppColors.primary, AppColors.secondary],
+                          gradient: LinearGradient(
+                            colors: isExceeded 
+                                ? [AppColors.error, Colors.red.shade900]
+                                : [statusColor, AppColors.secondary],
                           ),
                           borderRadius: BorderRadius.circular(6),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: statusColor.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -314,7 +369,7 @@ class DashboardScreen extends StatelessWidget {
                   Text(
                     '${CurrencyFormatter.format(budget.spent)} spent',
                     style: AppTypography.caption.copyWith(
-                      color: Colors.white70,
+                      color: isExceeded ? AppColors.error : Colors.white70,
                     ),
                   ),
                   Text(
@@ -451,6 +506,60 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlanCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, AppRouter.plan),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.15),
+                  Colors.white.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.auto_graph_rounded, color: AppColors.primary, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Financial Plan',
+                        style: AppTypography.headingSmall.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        'Set and track your savings goals',
+                        style: AppTypography.bodySmall.copyWith(color: Colors.white60),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white30, size: 16),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

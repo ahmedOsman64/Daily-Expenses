@@ -121,22 +121,25 @@ class _RegisterScreenState extends State<RegisterScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  _buildGlassTextField(
+                                   _buildGlassTextField(
                                     controller: _nameController,
                                     label: 'Full Name',
+                                    hintText: 'Enter your full name',
                                     icon: Icons.person_outline,
                                   ),
                                   const SizedBox(height: 20),
-                                  _buildGlassTextField(
+                                   _buildGlassTextField(
                                     controller: _emailController,
                                     label: 'Email Address',
+                                    hintText: 'Enter your email',
                                     icon: Icons.email_outlined,
                                     keyboardType: TextInputType.emailAddress,
                                   ),
                                   const SizedBox(height: 20),
-                                  _buildGlassTextField(
+                                   _buildGlassTextField(
                                     controller: _passwordController,
                                     label: 'Password',
+                                    hintText: 'Enter your password',
                                     icon: Icons.lock_outline,
                                     isPassword: _obscurePassword,
                                     suffixIcon: IconButton(
@@ -253,6 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   Widget _buildGlassTextField({
     required TextEditingController controller,
     required String label,
+    required String hintText,
     required IconData icon,
     bool isPassword = false,
     Widget? suffixIcon,
@@ -278,6 +282,11 @@ class _RegisterScreenState extends State<RegisterScreen>
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.white70),
             suffixIcon: suffixIcon,
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 14,
+            ),
             filled: true,
             fillColor: Colors.white.withValues(alpha: 0.1),
             border: OutlineInputBorder(

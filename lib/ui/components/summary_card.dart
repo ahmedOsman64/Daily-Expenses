@@ -23,7 +23,7 @@ class SummaryCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(24),
@@ -39,12 +39,12 @@ class SummaryCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: Colors.white, size: 24),
+                    child: Icon(icon, color: Colors.white, size: 22),
                   ),
                 ],
               ),
@@ -53,14 +53,17 @@ class SummaryCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     amount,
                     style: AppTypography.headingMedium.copyWith(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

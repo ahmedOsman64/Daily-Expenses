@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../viewmodels/auth_viewmodel.dart';
 import '../../../viewmodels/expense_viewmodel.dart';
 import '../../../models/income.dart';
 import '../../../theme/colors.dart';
@@ -72,8 +73,10 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> with SingleTickerProv
 
   void _save() {
     if (_formKey.currentState!.validate()) {
+      final authVm = context.read<AuthViewModel>();
       final income = Income(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: authVm.userId ?? 'anonymous',
         title: _titleController.text,
         amount: double.parse(_amountController.text),
         category: _selectedCategory,
@@ -92,9 +95,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> with SingleTickerProv
       appBar: AppBar(
         title: const Text('Add Income', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
-        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),

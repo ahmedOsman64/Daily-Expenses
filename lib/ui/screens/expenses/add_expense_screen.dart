@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../viewmodels/auth_viewmodel.dart';
 import '../../../viewmodels/expense_viewmodel.dart';
 import '../../../models/expense.dart';
 import '../../../core/constants/constants.dart';
@@ -73,8 +74,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> with SingleTickerPr
 
   void _save() {
     if (_formKey.currentState!.validate()) {
+      final authVm = context.read<AuthViewModel>();
       final expense = Expense(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: authVm.userId ?? 'anonymous',
         title: _titleController.text,
         amount: double.parse(_amountController.text),
         category: _selectedCategory,
@@ -93,9 +96,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> with SingleTickerPr
       appBar: AppBar(
         title: const Text('Add Expense', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
-        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),

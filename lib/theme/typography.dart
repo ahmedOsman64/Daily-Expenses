@@ -15,6 +15,12 @@ class AppTypography {
     color: AppColors.textPrimary,
   );
 
+  static final TextStyle headingSmall = GoogleFonts.poppins(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
+
   static final TextStyle bodyLarge = GoogleFonts.roboto(
     fontSize: 16,
     fontWeight: FontWeight.normal,
@@ -23,6 +29,12 @@ class AppTypography {
 
   static final TextStyle bodyMedium = GoogleFonts.roboto(
     fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: AppColors.textSecondary,
+  );
+
+  static final TextStyle bodySmall = GoogleFonts.roboto(
+    fontSize: 12,
     fontWeight: FontWeight.normal,
     color: AppColors.textSecondary,
   );

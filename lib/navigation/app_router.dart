@@ -12,7 +12,7 @@ import '../ui/screens/settings/edit_profile_screen.dart';
 import '../ui/screens/settings/change_password_screen.dart';
 import '../ui/screens/budget/manage_budget_screen.dart';
 import '../ui/screens/wallet/wallet_screen.dart';
-
+import '../ui/screens/plan/plan_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -28,6 +28,7 @@ class AppRouter {
   static const String manageBudget = '/manage-budget';
   static const String editProfile = '/edit-profile';
   static const String changePassword = '/change-password';
+  static const String plan = '/plan';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -57,6 +58,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const EditProfileScreen());
       case changePassword:
         return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+      case plan:
+        return MaterialPageRoute(builder: (_) => const PlanScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
