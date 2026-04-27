@@ -9,16 +9,17 @@ class ChangePasswordScreen extends StatefulWidget {
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> with SingleTickerProviderStateMixin {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen>
+    with SingleTickerProviderStateMixin {
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  
+
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -62,7 +63,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Change Password', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Change Password',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
@@ -111,7 +115,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,8 +127,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
                                 label: 'Current Password',
                                 hint: 'Enter current password',
                                 isObscure: _obscureCurrent,
-                                onToggleVisibility: () => setState(() => _obscureCurrent = !_obscureCurrent),
-                                validator: (v) => v!.isEmpty ? 'Current password required' : null,
+                                onToggleVisibility: () => setState(
+                                  () => _obscureCurrent = !_obscureCurrent,
+                                ),
+                                validator: (v) => v!.isEmpty
+                                    ? 'Current password required'
+                                    : null,
                               ),
                               const SizedBox(height: 24),
                               _buildPasswordField(
@@ -130,10 +140,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
                                 label: 'New Password',
                                 hint: 'Enter new password',
                                 isObscure: _obscureNew,
-                                onToggleVisibility: () => setState(() => _obscureNew = !_obscureNew),
+                                onToggleVisibility: () =>
+                                    setState(() => _obscureNew = !_obscureNew),
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) return 'New password required';
-                                  if (v.length < 6) return 'Password must be at least 6 characters';
+                                  if (v == null || v.isEmpty) {
+                                    return 'New password required';
+                                  }
+                                  if (v.length < 6) {
+                                    return 'Password must be at least 6 characters';
+                                  }
                                   return null;
                                 },
                               ),
@@ -143,10 +158,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
                                 label: 'Confirm New Password',
                                 hint: 'Re-enter new password',
                                 isObscure: _obscureConfirm,
-                                onToggleVisibility: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                onToggleVisibility: () => setState(
+                                  () => _obscureConfirm = !_obscureConfirm,
+                                ),
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) return 'Please confirm password';
-                                  if (v != _newPasswordController.text) return 'Passwords do not match';
+                                  if (v == null || v.isEmpty) {
+                                    return 'Please confirm password';
+                                  }
+                                  if (v != _newPasswordController.text) {
+                                    return 'Passwords do not match';
+                                  }
                                   return null;
                                 },
                               ),
@@ -179,7 +200,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
                           child: const Center(
                             child: Text(
                               'Update Password',
-                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -206,7 +231,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 14),
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -216,10 +244,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.white70),
+            prefixIcon: const Icon(
+              Icons.lock_outline_rounded,
+              color: Colors.white70,
+            ),
             suffixIcon: IconButton(
               icon: Icon(
-                isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                isObscure
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
                 color: Colors.white70,
               ),
               onPressed: onToggleVisibility,
@@ -232,7 +265,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> with Single
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              borderSide: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

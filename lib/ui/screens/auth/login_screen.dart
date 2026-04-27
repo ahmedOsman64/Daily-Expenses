@@ -39,6 +39,9 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
+  bool _obscurePassword = true;
+  bool _rememberMe = false;
+
   void _login() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -61,6 +64,28 @@ class _LoginScreenState extends State<LoginScreen>
         }
       }
     }
+  }
+
+  void _forgotPassword() {
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email to reset password'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    
+    // Simulate password reset
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Password reset link sent to your email!'),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -153,22 +178,63 @@ class _LoginScreenState extends State<LoginScreen>
                                     controller: _passwordController,
                                     label: 'Password',
                                     icon: Icons.lock_outline,
-                                    isPassword: true,
+                                    isPassword: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off_rounded
+                                            : Icons.visibility_rounded,
+                                        color: Colors.white70,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: TextButton(
-                                      onPressed: () {},
-                                      child: Text(
-                                        'Forgot Password?',
-                                        style: TextStyle(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.7,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: Checkbox(
+                                              value: _rememberMe,
+                                              onChanged: (v) {
+                                                setState(() {
+                                                  _rememberMe = v ?? false;
+                                                });
+                                              },
+                                              side: const BorderSide(color: Colors.white70),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              activeColor: AppColors.primary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'Remember Me',
+                                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                                          ),
+                                        ],
+                                      ),
+                                      TextButton(
+                                        onPressed: _forgotPassword,
+                                        child: Text(
+                                          'Forgot Password?',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.7,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                   const SizedBox(height: 24),
                                   Consumer<AuthViewModel>(
@@ -266,6 +332,7 @@ class _LoginScreenState extends State<LoginScreen>
     required String label,
     required IconData icon,
     bool isPassword = false,
+    Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
@@ -287,6 +354,7 @@ class _LoginScreenState extends State<LoginScreen>
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.white70),
+            suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white.withValues(alpha: 0.1),
             border: OutlineInputBorder(

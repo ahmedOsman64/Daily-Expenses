@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../viewmodels/auth_viewmodel.dart';
@@ -17,129 +18,157 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       body: SizedBox.expand(
         child: Stack(
-        children: [
-          // Background Gradient
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.gradientStart, AppColors.gradientEnd],
+          children: [
+            // Background Gradient
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.gradientStart, AppColors.gradientEnd],
+                  ),
                 ),
               ),
             ),
-          ),
-          // Content
-          SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.all(24),
-                  sliver: SliverToBoxAdapter(
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Profile Settings',
-                          style: AppTypography.headingLarge.copyWith(color: Colors.white, fontSize: 24),
-                        ),
-                      ],
+            // Content
+            SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(24),
+                    sliver: SliverToBoxAdapter(
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Profile Settings',
+                            style: AppTypography.headingLarge.copyWith(
+                              color: Colors.white,
+                              fontSize: 24,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _buildProfileCard(authVm),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: _buildProfileCard(authVm),
+                    ),
                   ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.all(24),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      _buildSectionHeader('REPORTS & ACTIVITY'),
-                      _buildSettingItem(
-                        icon: Icons.bar_chart_rounded,
-                        title: 'Analytics & Trends',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouter.analytics);
-                        },
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.history_rounded,
-                        title: 'Transaction History',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouter.expenseList);
-                        },
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.account_balance_wallet_rounded,
-                        title: 'Manage Budgets',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouter.manageBudget);
-                        },
-                      ),
-                      _buildSettingHeader('PREFERENCES'),
-                      _buildSettingItem(
-                        icon: Icons.dark_mode_rounded,
-                        title: 'Theme Mode',
-                        trailing: Text('Dark', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                        onTap: () {},
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.currency_exchange_rounded,
-                        title: 'Currency',
-                        trailing: const Text('USD (\$)', style: TextStyle(color: Colors.white70)),
-                        onTap: () {},
-                      ),
-                      _buildSettingHeader('ACCOUNT'),
-                      _buildSettingItem(
-                        icon: Icons.person_outline_rounded,
-                        title: 'Edit Profile',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouter.editProfile);
-                        },
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.lock_outline_rounded,
-                        title: 'Change Password',
-                        onTap: () {
-                          Navigator.pushNamed(context, AppRouter.changePassword);
-                        },
-                      ),
-                      _buildSettingItem(
-                        icon: Icons.logout_rounded,
-                        title: 'Logout',
-                        titleColor: AppColors.error,
-                        iconColor: AppColors.error,
-                        onTap: () {
-                          authVm.logout();
-                          Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (route) => false);
-                        },
-                      ),
-                      const SizedBox(height: 40),
-                      Center(
-                        child: Text(
-                          'Daily Expenses v1.0.0',
-                          style: TextStyle(color: Colors.white30, fontSize: 12),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(24),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _buildSectionHeader('REPORTS & ACTIVITY'),
+                        _buildSettingItem(
+                          icon: Icons.bar_chart_rounded,
+                          title: 'Analytics & Trends',
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRouter.analytics);
+                          },
                         ),
-                      ),
-                      const SizedBox(height: 120), // Space for nav bar
-                    ]),
+                        _buildSettingItem(
+                          icon: Icons.history_rounded,
+                          title: 'Transaction History',
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRouter.expenseList);
+                          },
+                        ),
+                        _buildSettingItem(
+                          icon: Icons.account_balance_wallet_rounded,
+                          title: 'Manage Budgets',
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRouter.manageBudget,
+                            );
+                          },
+                        ),
+                        _buildSettingHeader('PREFERENCES'),
+                        _buildSettingItem(
+                          icon: Icons.dark_mode_rounded,
+                          title: 'Theme Mode',
+                          trailing: Text(
+                            'Dark',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onTap: () {},
+                        ),
+                        _buildSettingItem(
+                          icon: Icons.currency_exchange_rounded,
+                          title: 'Currency',
+                          trailing: const Text(
+                            'USD (\$)',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          onTap: () {},
+                        ),
+                        _buildSettingHeader('ACCOUNT'),
+                        _buildSettingItem(
+                          icon: Icons.person_outline_rounded,
+                          title: 'Edit Profile',
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRouter.editProfile);
+                          },
+                        ),
+                        _buildSettingItem(
+                          icon: Icons.lock_outline_rounded,
+                          title: 'Change Password',
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRouter.changePassword,
+                            );
+                          },
+                        ),
+                        _buildSettingItem(
+                          icon: Icons.logout_rounded,
+                          title: 'Logout',
+                          titleColor: AppColors.error,
+                          iconColor: AppColors.error,
+                          onTap: () {
+                            authVm.logout();
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRouter.login,
+                              (route) => false,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        Center(
+                          child: Text(
+                            'Daily Expenses v1.0.0',
+                            style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 120), // Space for nav bar
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          // Bottom Navigation
-          const FloatingNavBar(currentIndex: 3),
-        ],
-      ),
+            // Bottom Navigation
+            const FloatingNavBar(currentIndex: 3),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, AppRouter.addExpense),
@@ -172,11 +201,24 @@ class SettingsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(colors: [AppColors.primary, AppColors.secondary]),
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary, AppColors.secondary],
+                      ),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=11'),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                      backgroundImage: vm.profileImage != null
+                          ? (vm.profileImage!.startsWith('http')
+                              ? NetworkImage(vm.profileImage!)
+                              : FileImage(io.File(vm.profileImage!)) as ImageProvider)
+                          : null,
+                      child: vm.profileImage == null
+                          ? Text(
+                              (vm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 32),
+                            )
+                          : null,
                     ),
                   ),
                   Positioned(
@@ -184,8 +226,15 @@ class SettingsScreen extends StatelessWidget {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                      child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 20),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
@@ -193,7 +242,10 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 vm.userName ?? 'User',
-                style: AppTypography.headingMedium.copyWith(color: Colors.white, fontSize: 24),
+                style: AppTypography.headingMedium.copyWith(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
               ),
               const SizedBox(height: 4),
               const Text(
@@ -212,7 +264,12 @@ class SettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16, top: 8),
       child: Text(
         title,
-        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5),
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          letterSpacing: 1.5,
+        ),
       ),
     );
   }
@@ -222,7 +279,12 @@ class SettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16, top: 24),
       child: Text(
         title,
-        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5),
+        style: const TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          letterSpacing: 1.5,
+        ),
       ),
     );
   }
@@ -248,9 +310,18 @@ class SettingsScreen extends StatelessWidget {
         leading: Icon(icon, color: iconColor ?? Colors.white70),
         title: Text(
           title,
-          style: TextStyle(color: titleColor ?? Colors.white, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: titleColor ?? Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        trailing: trailing ?? const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white30, size: 16),
+        trailing:
+            trailing ??
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white30,
+              size: 16,
+            ),
       ),
     );
   }

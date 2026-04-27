@@ -37,8 +37,13 @@ class _RegisterScreenState extends State<RegisterScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
+
+  bool _obscurePassword = true;
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
@@ -133,7 +138,20 @@ class _RegisterScreenState extends State<RegisterScreen>
                                     controller: _passwordController,
                                     label: 'Password',
                                     icon: Icons.lock_outline,
-                                    isPassword: true,
+                                    isPassword: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword
+                                            ? Icons.visibility_off_rounded
+                                            : Icons.visibility_rounded,
+                                        color: Colors.white70,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
                                   ),
                                   const SizedBox(height: 40),
                                   Consumer<AuthViewModel>(
@@ -237,6 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen>
     required String label,
     required IconData icon,
     bool isPassword = false,
+    Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
@@ -258,6 +277,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.white70),
+            suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white.withValues(alpha: 0.1),
             border: OutlineInputBorder(

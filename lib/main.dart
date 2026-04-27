@@ -7,6 +7,7 @@ import 'navigation/app_router.dart';
 import 'core/constants/constants.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [

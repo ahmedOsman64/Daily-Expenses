@@ -1,3 +1,4 @@
+import 'dart:io' as io;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -63,22 +64,27 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, AppRouter.settings),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
                             ),
-                          ),
-                          child: IconButton(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              AppRouter.settings,
-                            ),
-                            icon: const Icon(
-                              Icons.settings_rounded,
-                              color: Colors.white,
+                            child: CircleAvatar(
+                              radius: 24,
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                              backgroundImage: authVm.profileImage != null
+                                  ? (authVm.profileImage!.startsWith('http')
+                                      ? NetworkImage(authVm.profileImage!)
+                                      : FileImage(io.File(authVm.profileImage!)) as ImageProvider)
+                                  : null,
+                              child: authVm.profileImage == null
+                                  ? Text(
+                                      (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    )
+                                  : null,
                             ),
                           ),
                         ),
