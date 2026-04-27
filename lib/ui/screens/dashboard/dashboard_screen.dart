@@ -1,0 +1,441 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../viewmodels/expense_viewmodel.dart';
+import '../../../models/expense.dart';
+import '../../../viewmodels/auth_viewmodel.dart';
+import '../../../navigation/app_router.dart';
+import '../../../theme/colors.dart';
+import '../../../theme/typography.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../../../core/constants/constants.dart';
+import '../../components/summary_card.dart';
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authVm = context.watch<AuthViewModel>();
+    final expenseVm = context.watch<ExpenseViewModel>();
+
+    return Scaffold(
+      body: SizedBox.expand(
+        child: Stack(
+        children: [
+          // Background Gradient
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.gradientStart, AppColors.gradientEnd],
+                ),
+              ),
+            ),
+          ),
+          // Content
+          SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                // Top App Bar Style
+                SliverPadding(
+                  padding: const EdgeInsets.all(24),
+                  sliver: SliverToBoxAdapter(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome back,',
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: Colors.white70,
+                              ),
+                            ),
+                            Text(
+                              authVm.userName ?? 'User',
+                              style: AppTypography.headingLarge.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.1),
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              AppRouter.settings,
+                            ),
+                            icon: const Icon(
+                              Icons.settings_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Summary Cards
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  sliver: SliverToBoxAdapter(
+                    child: GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.1,
+                      children: [
+                        SummaryCard(
+                          title: 'Total Balance',
+                          amount: CurrencyFormatter.formatCompact(
+                            expenseVm.balance,
+                          ),
+                          icon: Icons.account_balance_wallet_rounded,
+                          color: AppColors.secondary,
+                        ),
+                        SummaryCard(
+                          title: 'Expenses',
+                          amount: CurrencyFormatter.formatCompact(
+                            expenseVm.totalExpenses,
+                          ),
+                          icon: Icons.show_chart_rounded,
+                          color: AppColors.error,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Budget Section
+                SliverPadding(
+                  padding: const EdgeInsets.all(24),
+                  sliver: SliverToBoxAdapter(
+                    child: _buildBudgetProgress(expenseVm),
+                  ),
+                ),
+                // Recent Expenses Header
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  sliver: SliverToBoxAdapter(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Recent Transactions',
+                          style: AppTypography.headingMedium.copyWith(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            AppRouter.expenseList,
+                          ),
+                          child: const Text(
+                            'View All',
+                            style: TextStyle(color: AppColors.secondary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Recent Expenses List
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final recent = expenseVm.expenses.take(5).toList();
+                        if (recent.isEmpty) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Text(
+                                'No transactions yet',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          );
+                        }
+                        final expense = recent[index];
+                        return _buildExpenseTile(expense);
+                      },
+                      childCount: expenseVm.expenses.isEmpty
+                          ? 1
+                          : (expenseVm.expenses.length > 5
+                                ? 5
+                                : expenseVm.expenses.length),
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
+            ),
+          ),
+          // Bottom Navigation (Floating style)
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 24,
+            child: _buildFloatingBottomNav(context),
+          ),
+        ],
+      ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, AppRouter.addExpense),
+        backgroundColor: AppColors.primary,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  Widget _buildBudgetProgress(ExpenseViewModel vm) {
+    final budget = vm.monthlyBudget;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Monthly Budget',
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${(budget.percentage * 100).toInt()}%',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Stack(
+                    children: [
+                      Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      AnimatedContainer(
+                        duration: const Duration(seconds: 1),
+                        height: 12,
+                        width:
+                            constraints.maxWidth *
+                            budget.percentage.clamp(0, 1),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.primary, AppColors.secondary],
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${CurrencyFormatter.format(budget.spent)} spent',
+                    style: AppTypography.caption.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                  Text(
+                    'Limit: ${CurrencyFormatter.format(budget.limit)}',
+                    style: AppTypography.caption.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpenseTile(Expense expense) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              expense.category.icon,
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  expense.title,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  expense.category.name,
+                  style: AppTypography.caption.copyWith(color: Colors.white60),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '-${CurrencyFormatter.format(expense.amount)}',
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.error,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingBottomNav(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home_rounded, 'Home', true, () {}),
+              _buildNavItem(Icons.bar_chart_rounded, 'Analytics', false, () {
+                Navigator.pushNamed(context, AppRouter.analytics);
+              }),
+              const SizedBox(width: 40), // Space for FAB
+              _buildNavItem(
+                Icons.account_balance_wallet_rounded,
+                'Wallet',
+                false,
+                () {
+                  Navigator.pushNamed(context, AppRouter.wallet);
+                },
+              ),
+              _buildNavItem(Icons.person_rounded, 'Profile', false, () {
+                Navigator.pushNamed(context, AppRouter.settings);
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    bool isActive,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? AppColors.primary : Colors.white60,
+            size: 28,
+          ),
+          const SizedBox(height: 4),
+          if (isActive)
+            Container(
+              height: 4,
+              width: 4,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
