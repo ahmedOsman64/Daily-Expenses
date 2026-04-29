@@ -4,6 +4,10 @@ class AppConstants {
   // Storage Keys
   static const String keyDarkMode = 'is_dark_mode';
   static const String keyUserLoggedIn = 'is_user_logged_in';
+
+  // Supabase Config (Replace with your actual credentials)
+  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
+  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
 }
 
 enum ExpenseCategory {

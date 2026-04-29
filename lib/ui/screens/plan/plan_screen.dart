@@ -291,117 +291,139 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
               borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
               border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Create New Plan', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 24),
-                _buildTextField(_titleController, 'Goal Title', 'e.g. Dream House', Icons.title_rounded),
-                const SizedBox(height: 20),
-                _buildTextField(_amountController, 'Target Amount', '0.00', Icons.attach_money_rounded, isNumber: true),
-                const SizedBox(height: 20),
-                const Text('Deadline', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _deadline,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 3650)),
-                    );
-                    if (picked != null) setState(() => _deadline = picked);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today_rounded, color: Colors.white54, size: 20),
-                        const SizedBox(width: 12),
-                        Text(DateFormat('MMMM dd, yyyy').format(_deadline), style: const TextStyle(color: Colors.white)),
-                      ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Create New Plan', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 24),
+                  _buildTextField(_titleController, 'Goal Title', 'e.g. Dream House', Icons.title_rounded),
+                  const SizedBox(height: 20),
+                  _buildTextField(_amountController, 'Target Amount', '0.00', Icons.attach_money_rounded, isNumber: true),
+                  const SizedBox(height: 20),
+                  const Text('Deadline', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _deadline,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 3650)),
+                      );
+                      if (picked != null) setState(() => _deadline = picked);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today_rounded, color: Colors.white54, size: 20),
+                          const SizedBox(width: 12),
+                          Text(DateFormat('MMMM dd, yyyy').format(_deadline), style: const TextStyle(color: Colors.white)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                const Text('Pick an Emoji & Color', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _emojis.map((e) => GestureDetector(
-                            onTap: () => setState(() => _selectedEmoji = e),
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 12),
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: _selectedEmoji == e ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
-                                border: Border.all(color: _selectedEmoji == e ? AppColors.primary : Colors.white10),
-                                shape: BoxShape.circle,
+                  const SizedBox(height: 24),
+                  const Text('Pick an Emoji & Color', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _emojis.map((e) => GestureDetector(
+                              onTap: () => setState(() => _selectedEmoji = e),
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: _selectedEmoji == e ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
+                                  border: Border.all(color: _selectedEmoji == e ? AppColors.primary : Colors.white10),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(e, style: const TextStyle(fontSize: 20)),
                               ),
-                              child: Text(e, style: const TextStyle(fontSize: 20)),
-                            ),
-                          )).toList(),
+                            )).toList(),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: _colors.map((c) => GestureDetector(
-                    onTap: () => setState(() => _selectedColor = c),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: _selectedColor == c ? Colors.white : Colors.transparent, width: 2),
-                      ),
-                    ),
-                  )).toList(),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_titleController.text.isNotEmpty && _amountController.text.isNotEmpty) {
-                        final authVm = context.read<AuthViewModel>();
-                        final goal = SavingsGoal(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          userId: authVm.userId ?? 'anonymous',
-                          title: _titleController.text,
-                          targetAmount: double.parse(_amountController.text),
-                          savedAmount: 0.0,
-                          deadline: _deadline,
-                          emoji: _selectedEmoji,
-                          color: _selectedColor,
-                        );
-                        context.read<SavingsViewModel>().addGoal(goal);
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                    child: const Text('Save Plan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Row(
+                    children: _colors.map((c) => GestureDetector(
+                      onTap: () => setState(() => _selectedColor = c),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: c,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: _selectedColor == c ? Colors.white : Colors.transparent, width: 2),
+                        ),
+                      ),
+                    )).toList(),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_titleController.text.isNotEmpty && _amountController.text.isNotEmpty) {
+                          String amountText = _amountController.text.trim().toUpperCase();
+                          double? amount;
+                          
+                          if (amountText.endsWith('K')) {
+                            amount = double.tryParse(amountText.replaceAll('K', ''));
+                            if (amount != null) amount *= 1000;
+                          } else if (amountText.endsWith('M')) {
+                            amount = double.tryParse(amountText.replaceAll('M', ''));
+                            if (amount != null) amount *= 1000000;
+                          } else {
+                            amount = double.tryParse(amountText);
+                          }
+
+                          if (amount == null || amount <= 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter a valid amount')),
+                            );
+                            return;
+                          }
+
+                          final authVm = context.read<AuthViewModel>();
+                          final goal = SavingsGoal(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            userId: authVm.userId ?? 'anonymous',
+                            title: _titleController.text,
+                            targetAmount: amount,
+                            savedAmount: 0.0,
+                            deadline: _deadline,
+                            emoji: _selectedEmoji,
+                            color: _selectedColor,
+                          );
+                          context.read<SavingsViewModel>().addGoal(goal);
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Text('Save Plan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -3,22 +3,41 @@ import 'package:provider/provider.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/expense_viewmodel.dart';
 import 'viewmodels/savings_viewmodel.dart';
+import 'services/supabase_service.dart';
 import 'theme/theme.dart';
 import 'navigation/app_router.dart';
 import 'core/constants/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    if (AppConstants.supabaseUrl != 'YOUR_SUPABASE_URL') {
+      await Supabase.initialize(
+        url: AppConstants.supabaseUrl,
+        anonKey: AppConstants.supabaseAnonKey,
+      );
+    }
+  } catch (e) {
+    debugPrint('Supabase initialization failed: $e');
+  }
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        Provider(create: (_) => SupabaseService()),
+        ChangeNotifierProvider(
+          create: (context) => AuthViewModel(context.read<SupabaseService>()),
+        ),
         ChangeNotifierProxyProvider<AuthViewModel, ExpenseViewModel>(
-          create: (_) => ExpenseViewModel(),
+          create: (context) =>
+              ExpenseViewModel(context.read<SupabaseService>()),
           update: (_, auth, expense) => expense!..updateUserId(auth.userId),
         ),
         ChangeNotifierProxyProvider<AuthViewModel, SavingsViewModel>(
-          create: (_) => SavingsViewModel(),
+          create: (context) =>
+              SavingsViewModel(context.read<SupabaseService>()),
           update: (_, auth, savings) => savings!..updateUserId(auth.userId),
         ),
       ],

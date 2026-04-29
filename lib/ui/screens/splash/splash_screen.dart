@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../navigation/app_router.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/typography.dart';
+import 'package:provider/provider.dart';
+import '../../../viewmodels/auth_viewmodel.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +22,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRouter.login);
+      final authViewModel = context.read<AuthViewModel>();
+      if (authViewModel.isLoggedIn) {
+        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRouter.login);
+      }
     }
   }
 

@@ -1,38 +1,55 @@
 import 'package:flutter/material.dart';
-
+import '../services/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/constants/constants.dart';
 class AuthViewModel extends ChangeNotifier {
+  final SupabaseService _supabaseService;
+  
   bool _isLoading = false;
-  bool _isLoggedIn = false;
-  String? _userName;
-  String _email = 'ahmed@example.com';
+  User? _user;
   String? _profileImage;
 
-  String? _userId;
+  AuthViewModel(this._supabaseService) {
+    _user = _supabaseService.currentUser;
+    _supabaseService.authStateChanges.listen((data) {
+      _user = data.session?.user;
+      notifyListeners();
+    });
+  }
 
   bool get isLoading => _isLoading;
-  bool get isLoggedIn => _isLoggedIn;
-  String? get userId => _userId;
-  String? get userName => _userName;
-  String get email => _email;
+  bool get isLoggedIn => _user != null;
+  String? get userId => _user?.id;
+  String? get userName => _user?.userMetadata?['full_name'] ?? _user?.email?.split('@')[0];
+  String get email => _user?.email ?? '';
   String? get profileImage => _profileImage;
 
   Future<void> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
-    // Mock API call
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (email.isNotEmpty && password.length >= 6) {
-      _isLoggedIn = true;
-      _userName = 'Ahmed';
-      _userId = 'user_123'; // Mock ID
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        // Mock login for testing
+        await Future.delayed(const Duration(seconds: 1));
+        _user = User(
+          id: 'test-user-id',
+          appMetadata: {},
+          userMetadata: {'full_name': 'Test User'},
+          aud: 'authenticated',
+          createdAt: DateTime.now().toIso8601String(),
+        );
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      await _supabaseService.signIn(email: email, password: password);
       _isLoading = false;
       notifyListeners();
-    } else {
+    } catch (e) {
       _isLoading = false;
       notifyListeners();
-      throw Exception('Invalid credentials');
+      rethrow;
     }
   }
 
@@ -40,55 +57,84 @@ class AuthViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Mock API call
-    await Future.delayed(const Duration(seconds: 2));
-
-    _isLoggedIn = true;
-    _userName = name;
-    _userId = 'user_${DateTime.now().millisecondsSinceEpoch}'; // Mock ID
-    _isLoading = false;
-    notifyListeners();
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        // Mock register for testing
+        await Future.delayed(const Duration(seconds: 1));
+        _user = User(
+          id: 'test-user-id',
+          appMetadata: {},
+          userMetadata: {'full_name': name},
+          aud: 'authenticated',
+          createdAt: DateTime.now().toIso8601String(),
+        );
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      await _supabaseService.signUp(
+        email: email,
+        password: password,
+        fullName: name,
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> updateProfile(String name, String email) async {
     _isLoading = true;
     notifyListeners();
 
-    // Mock API call
-    await Future.delayed(const Duration(seconds: 1));
-
-    _userName = name;
-    _email = email;
-    _isLoading = false;
-    notifyListeners();
+    try {
+      // Supabase user metadata update
+      await Supabase.instance.client.auth.updateUser(
+        UserAttributes(
+          data: {'full_name': name},
+        ),
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> updatePassword(String oldPassword, String newPassword) async {
     _isLoading = true;
     notifyListeners();
 
-    // Mock API call
-    await Future.delayed(const Duration(seconds: 1));
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await Supabase.instance.client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> updateProfileImage(String imageUrl) async {
     _isLoading = true;
     notifyListeners();
 
-    // Mock API call
-    await Future.delayed(const Duration(seconds: 1));
-
+    // In a real app, you'd upload to Supabase Storage first
     _profileImage = imageUrl;
     _isLoading = false;
     notifyListeners();
   }
 
-  void logout() {
-    _isLoggedIn = false;
-    _userName = null;
+  Future<void> logout() async {
+    await _supabaseService.signOut();
     notifyListeners();
   }
 }

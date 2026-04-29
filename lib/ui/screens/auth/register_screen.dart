@@ -47,13 +47,25 @@ class _RegisterScreenState extends State<RegisterScreen>
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
-      await context.read<AuthViewModel>().register(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
-      );
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+      try {
+        await context.read<AuthViewModel>().register(
+          _nameController.text,
+          _emailController.text,
+          _passwordController.text,
+        );
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     }
   }

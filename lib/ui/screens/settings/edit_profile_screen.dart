@@ -26,7 +26,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     super.initState();
     final authVm = context.read<AuthViewModel>();
     _nameController.text = authVm.userName ?? 'User';
-    _emailController.text = 'ahmed@example.com';
+    _emailController.text = authVm.email;
 
     _animationController = AnimationController(
       vsync: this,
@@ -47,16 +47,34 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     super.dispose();
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
     if (_formKey.currentState!.validate()) {
-      // In a real app, save to backend here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully!'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-      Navigator.pop(context);
+      try {
+        await context.read<AuthViewModel>().updateProfile(
+              _nameController.text,
+              _emailController.text,
+            );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile updated successfully!'),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Update failed: $e'),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
     }
   }
 
