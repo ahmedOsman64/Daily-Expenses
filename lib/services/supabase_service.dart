@@ -4,12 +4,31 @@ import '../models/income.dart';
 import '../models/savings_goal.dart';
 
 class SupabaseService {
-  final SupabaseClient _client = Supabase.instance.client;
+  SupabaseClient get _client {
+    try {
+      return Supabase.instance.client;
+    } catch (_) {
+      throw StateError('Supabase is not initialized (offline mode)');
+    }
+  }
 
   // --- AUTHENTICATION ---
 
-  User? get currentUser => _client.auth.currentUser;
-  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
+  User? get currentUser {
+    try {
+      return _client.auth.currentUser;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Stream<AuthState> get authStateChanges {
+    try {
+      return _client.auth.onAuthStateChange;
+    } catch (_) {
+      return const Stream.empty();
+    }
+  }
 
   Future<AuthResponse> signUp({
     required String email,
@@ -54,9 +73,7 @@ class SupabaseService {
   }
 
   Future<void> updatePassword(String newPassword) async {
-    await _client.auth.updateUser(
-      UserAttributes(password: newPassword),
-    );
+    await _client.auth.updateUser(UserAttributes(password: newPassword));
   }
 
   // --- EXPENSES ---
@@ -67,7 +84,7 @@ class SupabaseService {
         .select()
         .eq('user_id', currentUser?.id ?? '')
         .order('date', ascending: false);
-    
+
     return (response as List).map((e) => Expense.fromMap(e)).toList();
   }
 
@@ -76,10 +93,7 @@ class SupabaseService {
   }
 
   Future<void> updateExpense(Expense expense) async {
-    await _client
-        .from('expenses')
-        .update(expense.toMap())
-        .eq('id', expense.id);
+    await _client.from('expenses').update(expense.toMap()).eq('id', expense.id);
   }
 
   Future<void> deleteExpense(String id) async {
@@ -94,7 +108,7 @@ class SupabaseService {
         .select()
         .eq('user_id', currentUser?.id ?? '')
         .order('date', ascending: false);
-    
+
     return (response as List).map((i) => Income.fromMap(i)).toList();
   }
 
@@ -103,10 +117,7 @@ class SupabaseService {
   }
 
   Future<void> updateIncome(Income income) async {
-    await _client
-        .from('incomes')
-        .update(income.toMap())
-        .eq('id', income.id);
+    await _client.from('incomes').update(income.toMap()).eq('id', income.id);
   }
 
   Future<void> deleteIncome(String id) async {
@@ -120,7 +131,7 @@ class SupabaseService {
         .from('savings_goals')
         .select()
         .eq('user_id', currentUser?.id ?? '');
-    
+
     return (response as List).map((s) => SavingsGoal.fromMap(s)).toList();
   }
 
@@ -129,10 +140,7 @@ class SupabaseService {
   }
 
   Future<void> updateSavingsGoal(SavingsGoal goal) async {
-    await _client
-        .from('savings_goals')
-        .update(goal.toMap())
-        .eq('id', goal.id);
+    await _client.from('savings_goals').update(goal.toMap()).eq('id', goal.id);
   }
 
   Future<void> deleteSavingsGoal(String id) async {

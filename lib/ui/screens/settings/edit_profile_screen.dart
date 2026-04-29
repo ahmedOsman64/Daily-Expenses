@@ -240,7 +240,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                               radius: 60,
                               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                               backgroundImage: authVm.profileImage != null
-                                  ? (authVm.profileImage!.startsWith('http')
+                                  ? (authVm.profileImage!.startsWith('http') || authVm.profileImage!.startsWith('blob:')
                                       ? NetworkImage(authVm.profileImage!)
                                       : FileImage(io.File(authVm.profileImage!))
                                           as ImageProvider)

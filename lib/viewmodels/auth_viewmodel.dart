@@ -91,9 +91,24 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        _user = User(
+          id: _user?.id ?? 'test-user-id',
+          email: email,
+          appMetadata: _user?.appMetadata ?? {},
+          userMetadata: {'full_name': name},
+          aud: _user?.aud ?? 'authenticated',
+          createdAt: _user?.createdAt ?? DateTime.now().toIso8601String(),
+        );
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
       // Supabase user metadata update
       await Supabase.instance.client.auth.updateUser(
         UserAttributes(
+          email: email,
           data: {'full_name': name},
         ),
       );
@@ -111,6 +126,13 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        await Future.delayed(const Duration(seconds: 1));
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
       await Supabase.instance.client.auth.updateUser(
         UserAttributes(password: newPassword),
       );
@@ -134,7 +156,91 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _supabaseService.signOut();
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        _user = null;
+        notifyListeners();
+        return;
+      }
+      await _supabaseService.signOut();
+      _user = null;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error logging out: $e');
+      // Force logout on client side even if server request fails
+      _user = null;
+      notifyListeners();
+    }
+  }
+  Future<void> requestPasswordReset(String email) async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        await Future.delayed(const Duration(seconds: 1)); // Mock network delay
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      
+      await Supabase.instance.client.auth.resetPasswordForEmail(email);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> verifyPasswordResetOtp(String email, String otp) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        await Future.delayed(const Duration(seconds: 1)); // Mock network delay
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      
+      await Supabase.instance.client.auth.verifyOTP(
+        type: OtpType.recovery,
+        token: otp,
+        email: email,
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> confirmPasswordReset(String email, String newPassword) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
+        await Future.delayed(const Duration(seconds: 1)); // Mock network delay
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      
+      await Supabase.instance.client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 }

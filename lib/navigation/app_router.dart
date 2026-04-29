@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../ui/screens/splash/splash_screen.dart';
 import '../ui/screens/auth/login_screen.dart';
 import '../ui/screens/auth/register_screen.dart';
+import '../ui/screens/auth/forgot_password_screen.dart';
+import '../ui/screens/auth/verify_otp_screen.dart';
+import '../ui/screens/auth/reset_password_screen.dart';
 import '../ui/screens/dashboard/dashboard_screen.dart';
 import '../ui/screens/expenses/add_expense_screen.dart';
 import '../ui/screens/expenses/expense_list_screen.dart';
@@ -29,6 +32,9 @@ class AppRouter {
   static const String editProfile = '/edit-profile';
   static const String changePassword = '/change-password';
   static const String plan = '/plan';
+  static const String forgotPassword = '/forgot-password';
+  static const String verifyOtp = '/verify-otp';
+  static const String resetPassword = '/reset-password';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -38,6 +44,20 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case forgotPassword:
+        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+      case verifyOtp:
+        return MaterialPageRoute(
+          builder: (_) => VerifyOtpScreen(
+            email: routeSettings.arguments as String? ?? '',
+          ),
+        );
+      case resetPassword:
+        return MaterialPageRoute(
+          builder: (_) => ResetPasswordScreen(
+            email: routeSettings.arguments as String? ?? '',
+          ),
+        );
       case dashboard:
         return MaterialPageRoute(builder: (_) => const DashboardScreen());
       case addExpense:

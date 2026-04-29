@@ -62,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: _buildProfileCard(authVm),
+                      child: _buildProfileCard(context, authVm),
                     ),
                   ),
                   SliverPadding(
@@ -181,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileCard(AuthViewModel vm) {
+  Widget _buildProfileCard(BuildContext context, AuthViewModel vm) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: BackdropFilter(
@@ -211,7 +211,7 @@ class SettingsScreen extends StatelessWidget {
                       child: vm.profileImage != null
                           ? ClipOval(
                               child: Image(
-                                image: vm.profileImage!.startsWith('http')
+                                image: vm.profileImage!.startsWith('http') || vm.profileImage!.startsWith('blob:')
                                     ? NetworkImage(vm.profileImage!)
                                     : FileImage(io.File(vm.profileImage!)) as ImageProvider,
                                 fit: BoxFit.cover,
@@ -234,16 +234,21 @@ class SettingsScreen extends StatelessWidget {
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt_rounded,
-                        color: Colors.white,
-                        size: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRouter.editProfile);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -258,9 +263,9 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'ahmed@example.com',
-                style: TextStyle(color: Colors.white60, fontSize: 14),
+              Text(
+                vm.email.isNotEmpty ? vm.email : 'No email provided',
+                style: const TextStyle(color: Colors.white60, fontSize: 14),
               ),
             ],
           ),

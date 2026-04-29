@@ -78,7 +78,7 @@ class DashboardScreen extends StatelessWidget {
                               child: authVm.profileImage != null
                                   ? ClipOval(
                                       child: Image(
-                                        image: authVm.profileImage!.startsWith('http')
+                                        image: authVm.profileImage!.startsWith('http') || authVm.profileImage!.startsWith('blob:')
                                             ? NetworkImage(authVm.profileImage!)
                                             : FileImage(io.File(authVm.profileImage!)) as ImageProvider,
                                         fit: BoxFit.cover,
