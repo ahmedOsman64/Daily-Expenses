@@ -16,6 +16,7 @@ import '../ui/screens/settings/change_password_screen.dart';
 import '../ui/screens/budget/manage_budget_screen.dart';
 import '../ui/screens/wallet/wallet_screen.dart';
 import '../ui/screens/plan/plan_screen.dart';
+import '../ui/screens/notifications/notifications_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -35,6 +36,7 @@ class AppRouter {
   static const String forgotPassword = '/forgot-password';
   static const String verifyOtp = '/verify-otp';
   static const String resetPassword = '/reset-password';
+  static const String notifications = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -80,6 +82,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
       case plan:
         return MaterialPageRoute(builder: (_) => const PlanScreen());
+      case notifications:
+        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

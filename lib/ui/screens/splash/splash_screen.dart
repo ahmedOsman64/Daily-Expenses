@@ -20,13 +20,26 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToNext() async {
+    // Wait at least 2 seconds for branding
     await Future.delayed(const Duration(seconds: 2));
+    
     if (mounted) {
       final authViewModel = context.read<AuthViewModel>();
-      if (authViewModel.isLoggedIn) {
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
-      } else {
-        Navigator.pushReplacementNamed(context, AppRouter.login);
+      
+      // Wait for AuthViewModel to finish initialization if it hasn't yet
+      if (!authViewModel.isInitialized) {
+        // We can use a listener or just a small loop to wait
+        while (!authViewModel.isInitialized && mounted) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+      }
+      
+      if (mounted) {
+        if (authViewModel.isLoggedIn) {
+          Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRouter.login);
+        }
       }
     }
   }

@@ -4,9 +4,11 @@ import '../models/budget.dart';
 import '../models/income.dart';
 import '../core/constants/constants.dart';
 import '../services/supabase_service.dart';
+import 'notification_viewmodel.dart';
 
 class ExpenseViewModel extends ChangeNotifier {
   final SupabaseService _supabaseService;
+  NotificationViewModel? _notificationViewModel;
   String? _userId;
 
   List<Expense> _allExpenses = [];
@@ -25,6 +27,10 @@ class ExpenseViewModel extends ChangeNotifier {
     if (AppConstants.supabaseUrl == 'YOUR_SUPABASE_URL') {
       _loadSampleData();
     }
+  }
+
+  void setNotificationViewModel(NotificationViewModel? vm) {
+    _notificationViewModel = vm;
   }
 
   void _loadSampleData() {
@@ -130,6 +136,9 @@ class ExpenseViewModel extends ChangeNotifier {
       month: _monthlyBudget.month,
       year: _monthlyBudget.year,
     );
+    // Fire budget & balance notifications
+    _notificationViewModel?.checkBudget(spent, _monthlyBudget.limit);
+    _notificationViewModel?.checkBalance(balance);
   }
 
   List<Expense> get expenses =>
@@ -147,6 +156,8 @@ class ExpenseViewModel extends ChangeNotifier {
     // Add locally first
     _allIncomes.insert(0, income);
     notifyListeners();
+    // Fire notification
+    _notificationViewModel?.onIncomeAdded(income.title, income.amount);
 
     try {
       if (income.userId != 'anonymous') {
@@ -174,6 +185,8 @@ class ExpenseViewModel extends ChangeNotifier {
     _allExpenses.insert(0, expense);
     _recalculateBudget();
     notifyListeners();
+    // Fire notification
+    _notificationViewModel?.onExpenseAdded(expense.title, expense.amount);
 
     try {
       if (expense.userId != 'anonymous') {

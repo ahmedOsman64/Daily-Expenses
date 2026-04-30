@@ -12,6 +12,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/constants/constants.dart';
 import '../../components/summary_card.dart';
 import '../../components/financial_wisdom_card.dart';
+import '../../../viewmodels/notification_viewmodel.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -20,6 +21,12 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
     final expenseVm = context.watch<ExpenseViewModel>();
+    final notifVm = context.watch<NotificationViewModel>();
+
+    // Send welcome notification once per session
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifVm.sendWelcomeNotification(authVm.userName);
+    });
 
     return Scaffold(
       body: SizedBox.expand(
@@ -65,39 +72,81 @@ class DashboardScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, AppRouter.settings),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
-                            ),
-                            child: CircleAvatar(
-                              radius: 24,
-                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                              child: authVm.profileImage != null
-                                  ? ClipOval(
-                                      child: Image(
-                                        image: authVm.profileImage!.startsWith('http') || authVm.profileImage!.startsWith('blob:')
-                                            ? NetworkImage(authVm.profileImage!)
-                                            : FileImage(io.File(authVm.profileImage!)) as ImageProvider,
-                                        fit: BoxFit.cover,
-                                        width: 48,
-                                        height: 48,
-                                        errorBuilder: (context, error, stackTrace) => Center(
-                                          child: Text(
-                                            (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
-                                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                          ),
+                        Row(
+                          children: [
+                            // Bell icon with unread badge
+                            GestureDetector(
+                              onTap: () => Navigator.pushNamed(context, AppRouter.notifications),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                    ),
+                                    child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+                                  ),
+                                  if (notifVm.unreadCount > 0)
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFEF5350),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                                        child: Text(
+                                          notifVm.unreadCount > 9 ? '9+' : '${notifVm.unreadCount}',
+                                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
-                                    )
-                                  : Text(
-                                      (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                     ),
+                                ],
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 10),
+                            // Avatar / Settings
+                            GestureDetector(
+                              onTap: () => Navigator.pushNamed(context, AppRouter.settings),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
+                                ),
+                                child: CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                                  child: authVm.profileImage != null
+                                      ? ClipOval(
+                                          child: Image(
+                                            image: authVm.profileImage!.startsWith('http') || authVm.profileImage!.startsWith('blob:')
+                                                ? NetworkImage(authVm.profileImage!)
+                                                : FileImage(io.File(authVm.profileImage!)) as ImageProvider,
+                                            fit: BoxFit.cover,
+                                            width: 48,
+                                            height: 48,
+                                            errorBuilder: (context, error, stackTrace) => Center(
+                                              child: Text(
+                                                (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          (authVm.userName ?? 'U').substring(0, 1).toUpperCase(),
+                                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

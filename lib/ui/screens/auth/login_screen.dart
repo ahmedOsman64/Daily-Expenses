@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   bool _obscurePassword = true;
-  bool _rememberMe = false;
+  bool _rememberMe = true;
 
   void _login() async {
     if (_formKey.currentState!.validate()) {

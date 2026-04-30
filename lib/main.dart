@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/expense_viewmodel.dart';
 import 'viewmodels/savings_viewmodel.dart';
+import 'viewmodels/notification_viewmodel.dart';
 import 'services/supabase_service.dart';
 import 'theme/theme.dart';
 import 'navigation/app_router.dart';
@@ -32,10 +33,17 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => AuthViewModel(context.read<SupabaseService>()),
         ),
-        ChangeNotifierProxyProvider<AuthViewModel, ExpenseViewModel>(
+        // NotificationViewModel must be registered BEFORE ExpenseViewModel
+        ChangeNotifierProvider(
+          create: (_) => NotificationViewModel(),
+        ),
+        ChangeNotifierProxyProvider2<AuthViewModel, NotificationViewModel, ExpenseViewModel>(
           create: (context) =>
               ExpenseViewModel(context.read<SupabaseService>()),
-          update: (_, auth, expense) => expense!..updateUserId(auth.userId),
+          update: (_, auth, notif, expense) =>
+              expense!
+                ..setNotificationViewModel(notif)
+                ..updateUserId(auth.userId),
         ),
         ChangeNotifierProxyProvider<AuthViewModel, SavingsViewModel>(
           create: (context) =>
